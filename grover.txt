@@ -1,0 +1,9 @@
+sudo apt-get install gcc-avr avr-libc avrdude i2c-tools
+
+avr-gcc -Wall -mmcu=atmega328p -Os main.c -o main
+
+avr-objcopy -j .text -j .data -O ihex main main.hex
+
+export GPIO8(RESET): echo 8 > /sys/class/gpio/export
+
+sudo avrdude -c linuxspi -P /dev/spidev0.1 -p m328p -U flash:w:main.hex:i
