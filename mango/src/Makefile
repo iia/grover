@@ -13,15 +13,15 @@ all: builddir
 	avr-gcc $(LDFLAGS) -mmcu=$(MCU) $(BUILDDIR)$(PROJECT).o -o $(BUILDDIR)$(PROJECT).elf
 	avr-objcopy -O ihex -j .data -j text $(BUILDDIR)$(PROJECT).elf $(BUILDDIR)$(PROJECT).hex
 
-size:
-	avr-size --mcu=$(MCU) -C $(BUILDDIR)$(PROJECT).elf
-
 flash:
 	/root/avrdude -p $(MCU) -c $(PROGRAMMER) -P $(PORT) -U flash:w:$(BUILDDIR)$(PROJECT).hex:a
 	echo 8 > /sys/class/gpio/export
 	echo out > /sys/class/gpio/gpio8/direction
 	echo 1 > /sys/class/gpio/gpio8/value
 	echo 8 > /sys/class/gpio/unexport
+
+size:
+	avr-size --mcu=$(MCU) -C $(BUILDDIR)$(PROJECT).elf
 
 builddir:
 	$(shell mkdir -p $(BUILDDIR))
