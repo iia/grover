@@ -14,12 +14,16 @@ all: builddir
 
 flash:
 	$(shell \
+		echo 8 > /sys/class/gpio/unexport; \
+		echo 9 > /sys/class/gpio/unexport; \
+		echo 10 > /sys/class/gpio/unexport; \
+		echo 11 > /sys/class/gpio/unexport; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U flash:w:$(BUILDDIR)$(PROJECT).hex:a; \
 		echo 8 > /sys/class/gpio/export && \
 		echo out > /sys/class/gpio/gpio8/direction && \
 		echo 1 > /sys/class/gpio/gpio8/value && \
-		echo 8 > /sys/class/gpio/unexport)
-
+		echo 8 > /sys/class/gpio/unexport
+	)
 
 size:
 	avr-size --mcu=$(MCU) -C $(BUILDDIR)$(PROJECT).elf
@@ -29,11 +33,16 @@ builddir:
 
 info:
 	$(shell \
+		echo 8 > /sys/class/gpio/unexport; \
+		echo 9 > /sys/class/gpio/unexport; \
+		echo 10 > /sys/class/gpio/unexport; \
+		echo 11 > /sys/class/gpio/unexport; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -v; \
 		echo 8 > /sys/class/gpio/export && \
 		echo out > /sys/class/gpio/gpio8/direction && \
 		echo 1 > /sys/class/gpio/gpio8/value && \
-		echo 8 > /sys/class/gpio/unexport)
+		echo 8 > /sys/class/gpio/unexport
+	)
 
 clean:
 	rm -rf *.o
