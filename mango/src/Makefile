@@ -22,8 +22,7 @@ flash:
 		echo 8 > /sys/class/gpio/export && \
 		echo out > /sys/class/gpio/gpio8/direction && \
 		echo 1 > /sys/class/gpio/gpio8/value && \
-		echo 8 > /sys/class/gpio/unexport
-	)
+		echo 8 > /sys/class/gpio/unexport)
 
 size:
 	avr-size --mcu=$(MCU) -C $(BUILDDIR)$(PROJECT).elf
@@ -41,8 +40,7 @@ info:
 		echo 8 > /sys/class/gpio/export && \
 		echo out > /sys/class/gpio/gpio8/direction && \
 		echo 1 > /sys/class/gpio/gpio8/value && \
-		echo 8 > /sys/class/gpio/unexport
-	)
+		echo 8 > /sys/class/gpio/unexport)
 
 clean:
 	rm -rf *.o
