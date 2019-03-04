@@ -18,6 +18,9 @@ flash:
 		echo 9 > /sys/class/gpio/unexport; \
 		echo 10 > /sys/class/gpio/unexport; \
 		echo 11 > /sys/class/gpio/unexport; \
+		avrdude -p $(MCU) -c $(PROGRAMMER) -U lfuse:w:0xFF:m; \
+		avrdude -p $(MCU) -c $(PROGRAMMER) -U hfuse:w:0xDA:m; \
+		avrdude -p $(MCU) -c $(PROGRAMMER) -U efuse:w:0x05:m; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U flash:w:$(BUILDDIR)$(PROJECT).hex:a; \
 		echo 8 > /sys/class/gpio/export && \
 		echo out > /sys/class/gpio/gpio8/direction && \
