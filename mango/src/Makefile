@@ -1,7 +1,7 @@
 PROJECT=mango
 
 LDFLAGS=
-CFLAGS=-Wall -c -Ofast
+CFLAGS=-Wall -c -Os
 BUILDDIR=./build/
 
 MCU=atmega328p
@@ -10,7 +10,7 @@ PROGRAMMER=linuxgpio
 all: builddir
 	avr-gcc $(CFLAGS) -mmcu=$(MCU) -I./include $(PROJECT).c -o $(BUILDDIR)$(PROJECT).o
 	avr-gcc $(LDFLAGS) -mmcu=$(MCU) -I./include $(BUILDDIR)$(PROJECT).o -o $(BUILDDIR)$(PROJECT).elf
-	avr-objcopy -O ihex -j .data -j text $(BUILDDIR)$(PROJECT).elf $(BUILDDIR)$(PROJECT).hex
+	avr-objcopy -O ihex -j .data -j .text $(BUILDDIR)$(PROJECT).elf $(BUILDDIR)$(PROJECT).hex
 
 flash:
 	$(shell \
