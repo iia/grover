@@ -1,6 +1,6 @@
 #define I2C_ADDRESS 42
 
-#define NUMBER_OF_PORTS 11
+#define GROVEPI_PORTS 11
 
 #define RX_BUF_IDX_PRT 0
 #define RX_BUF_IDX_FID 1
@@ -13,8 +13,8 @@
 #define RX_BUF_LEN (RX_BUF_LEN_PRT + RX_BUF_LEN_FID + RX_BUF_LEN_DAT)
 #define TX_BUF_LEN 6
 
-#define RST_INT_DIS_ACK (1 << TWINT)
-#define RST_INT_ENA_ACK ((1 << TWINT) | (1 << TWEA))
+#define RST_INT_DIS_ACK (_BV(TWINT))
+#define RST_INT_ENA_ACK ((_BV(TWINT)) | (_BV(TWEA)))
 
 #define ERR_PRT_HND_INV_DAT -1
 #define ERR_PRT_HND_INV_FID -2

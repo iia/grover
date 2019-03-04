@@ -1,7 +1,4 @@
-#define UART_DATA 3
-#define UART_BAUD 9600
 #define F_CPU 16000000UL
-#define UART_UBRR (F_CPU / 16) / UART_BAUD - 1
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -144,36 +141,37 @@ static int8_t port_handler_10(uint8_t fid) {
 }
 
 static void i2c_init(uint8_t i2c_address) {
-	TWAR = (i2c_address << 1); // GCALL disabled.
-	TWCR = (1 << TWIE) | (1 << TWEA) | (1 << TWINT) | (1 << TWEN);
+	TWAR = (i2c_address << 1); // Disable general call.
+	TWCR = _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWEN);
 }
 
-static void uart_init(void) {
-	UBRR0H = ((UART_UBRR) & 0xF00);
-	UBRR0L = (uint8_t)((UART_UBRR) & 0xFF);
+static void uart_init(uint32_t baud) {
+	// UART TX only (8-N-1).
+	uint8_t ubrr = ((F_CPU / 16) / baud) - 1;
 
+	UBRR0H = (uint8_t)(ubrr & 0x0F00);
+	UBRR0L = (uint8_t)(ubrr & 0x00FF);
 	UCSR0B |= _BV(TXEN0);
-
-	UCSR0C = (UART_DATA << UCSZ00);
+	UCSR0C = (3 << UCSZ00);
 }
 
-static void uart_tx_char(char data) {
+static void uart_tx_char(char c) {
 	while (!(UCSR0A & _BV(UDRE0))) {
 		;
 	}
 
-	UDR0 = (char)data;
+	UDR0 = c;
 }
 
-static void uart_tx_string(char* string) {
-	while (*string != '\0') {
-		uart_tx_char(*string);
+static void uart_tx_string(char* s) {
+	while (*s != '\0') {
+		uart_tx_char(*s);
 
-		++string;
+		++s;
 	}
 }
 
-static PORT_HANDLER_t port_handler[NUMBER_OF_PORTS] =
+static PORT_HANDLER_t port_handler[GROVEPI_PORTS] =
 	{
 		&port_handler_0,
 		&port_handler_1,
@@ -191,12 +189,12 @@ static PORT_HANDLER_t port_handler[NUMBER_OF_PORTS] =
 int main(void) {
 	cli();
 
-	uart_init();
+	uart_init(9600);
 	i2c_init((uint8_t)I2C_ADDRESS);
 
 	memset(&ctx_port_handler, 0, sizeof(ctx_port_handler));
 
-	uart_tx_string("Running...\n\0");
+	uart_tx_string("Grover - Mango v1.0\r\n\0");
 
 	sei();
 
@@ -209,9 +207,9 @@ int main(void) {
 
 ISR(TWI_vect) {
 	switch((TWSR & 0xFC)) {
-		// Slave RX (Write GrovePi)
+		// Slave RX (Write GrovePi).
 
-		// TWSR = 0x60 (RX: ADDR+W, TX: ACK)
+		// TWSR = 0x60 (RX: ADDR+W, TX: ACK).
 		case TW_SR_SLA_ACK:
 			ctx_port_handler.rx_tx_buffer_idx = 0;
 			ctx_port_handler.tx_data_valid = false;
@@ -219,7 +217,7 @@ ISR(TWI_vect) {
 
 			break;
 
-		// TWSR = 0x80 (Got TW_SR_SLA_ACK previously) (RX: DATA, TX: ACK)
+		// TWSR = 0x80 (Got TW_SR_SLA_ACK previously) (RX: DATA, TX: ACK).
 		case TW_SR_DATA_ACK:
 			ctx_port_handler.rx_buffer[ctx_port_handler.rx_tx_buffer_idx] = TWDR;
 
@@ -233,13 +231,13 @@ ISR(TWI_vect) {
 
 			break;
 
-		// TWSR = 0x88 (Got TW_SR_SLA_ACK previously) (RX: DATA, TX: NACK)
+		// TWSR = 0x88 (Got TW_SR_SLA_ACK previously) (RX: DATA, TX: NACK).
 		case TW_SR_DATA_NACK:
 			TWCR |= RST_INT_ENA_ACK;
 
 			break;
 
-		// TWSR = 0xA0 (RX: Got STOP/RSTART while being addressed as slave, TX: N/A)
+		// TWSR = 0xA0 (RX: Got STOP/RSTART while being addressed as slave, TX: N/A).
 		case TW_SR_STOP:
 			memcpy(
 				&ctx_port_handler.rx_port,
@@ -265,9 +263,9 @@ ISR(TWI_vect) {
 
 			break;
 
-		// Slave TX (Read GrovePi)
+		// Slave TX (Read GrovePi).
 
-		// TWSR = 0xA8 (RX: ADDR+R, TX: ACK)
+		// TWSR = 0xA8 (RX: ADDR+R, TX: ACK).
 		case TW_ST_SLA_ACK:
 			ctx_port_handler.rx_tx_buffer_idx = 0;
 
@@ -284,7 +282,7 @@ ISR(TWI_vect) {
 
 			break;
 
-		// TWSR = 0xB8 (RX: ACK, TX: TWDR)
+		// TWSR = 0xB8 (RX: ACK, TX: TWDR).
 		case TW_ST_DATA_ACK:
 			if (!ctx_port_handler.tx_data_valid) {
 				TWDR = 0;
@@ -308,7 +306,7 @@ ISR(TWI_vect) {
 
 			break;
 
-		// TWSR = 0xC0 or 0xC8 (RX: NACK, TX: TWDR)
+		// TWSR = 0xC0 or 0xC8 (RX: NACK, TX: TWDR).
 		case TW_ST_DATA_NACK:
 		case TW_ST_LAST_DATA:
 			// Reset internal data.
