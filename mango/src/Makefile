@@ -1,16 +1,44 @@
 PROJECT=mango
+BUILDDIR=./build/
+INCLUDEDIR=./include/
 
 LDFLAGS=
 CFLAGS=-Wall -c -Os
-BUILDDIR=./build/
 
 MCU=atmega328p
 PROGRAMMER=linuxgpio
 
-all: builddir
-	avr-gcc $(CFLAGS) -mmcu=$(MCU) -I./include $(PROJECT).c -o $(BUILDDIR)$(PROJECT).o
-	avr-gcc $(LDFLAGS) -mmcu=$(MCU) -I./include $(BUILDDIR)$(PROJECT).o -o $(BUILDDIR)$(PROJECT).elf
-	avr-objcopy -O ihex -j .data -j .text $(BUILDDIR)$(PROJECT).elf $(BUILDDIR)$(PROJECT).hex
+OBJECTS := $(addprefix $(BUILDDIR),$(patsubst %.c,%.o,$(wildcard *.c)))
+
+all: builddir $(OBJECTS)
+	avr-gcc \
+		$(LDFLAGS) \
+		-mmcu=$(MCU) \
+		-DF_CPU=16000000 \
+		-I$(INCLUDEDIR) \
+		$(OBJECTS) \
+		-o $(BUILDDIR)$(PROJECT).elf
+
+	avr-objcopy \
+		-O ihex \
+		-j .data \
+		-j .text \
+		$(BUILDDIR)$(PROJECT).elf \
+		$(BUILDDIR)$(PROJECT).hex
+
+builddir:
+	$(shell mkdir -p $(BUILDDIR))
+
+$(BUILDDIR)%.o: %.c $(INCLUDEDIR)%.h
+	avr-gcc \
+		$(CFLAGS) \
+		-mmcu=$(MCU) \
+		-DF_CPU=16000000 \
+		-I$(INCLUDEDIR) \
+		$< -o $@
+
+size:
+	avr-size --mcu=$(MCU) -C $(BUILDDIR)$(PROJECT).elf
 
 flash:
 	$(shell \
@@ -26,12 +54,6 @@ flash:
 		echo out > /sys/class/gpio/gpio8/direction && \
 		echo 1 > /sys/class/gpio/gpio8/value && \
 		echo 8 > /sys/class/gpio/unexport)
-
-size:
-	avr-size --mcu=$(MCU) -C $(BUILDDIR)$(PROJECT).elf
-
-builddir:
-	$(shell mkdir -p $(BUILDDIR))
 
 info:
 	$(shell \

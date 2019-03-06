@@ -1,5 +1,5 @@
 #! /bin/bash
 
-docker build -t 'mango-farmer:dockerfile' ./docker/
+docker pull iia86/mango-farmer:v1
 
-docker run --privileged --rm -it -v $(pwd)/src/:/root/src/ mango-farmer:dockerfile ./mango-build-flash.sh
+docker run --privileged --rm -it -v $(pwd)/src/:/root/src/ iia86/mango-farmer:v1 ./scripts/mango-build-flash.sh
