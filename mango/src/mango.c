@@ -15,7 +15,7 @@ int main(void) {
 
 	memset(&ctx_port_handler, 0, sizeof(ctx_port_handler));
 
-	debug_uart_tx_string("Grover - Mango v1.0\r\n\0");
+	debug_uart_tx_string("[+] Grover - Mango v1.0\r\n\0");
 
 	sei();
 
