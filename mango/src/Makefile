@@ -50,9 +50,9 @@ flash:
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U hfuse:w:0xDA:m; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U efuse:w:0x05:m; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U flash:w:$(BUILDDIR)$(PROJECT).hex:a; \
-		echo 8 > /sys/class/gpio/export && \
-		echo out > /sys/class/gpio/gpio8/direction && \
-		echo 1 > /sys/class/gpio/gpio8/value && \
+		echo 8 > /sys/class/gpio/export; \
+		echo out > /sys/class/gpio/gpio8/direction; \
+		echo 1 > /sys/class/gpio/gpio8/value; \
 		echo 8 > /sys/class/gpio/unexport)
 
 info:
@@ -62,9 +62,19 @@ info:
 		echo 10 > /sys/class/gpio/unexport; \
 		echo 11 > /sys/class/gpio/unexport; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -v; \
-		echo 8 > /sys/class/gpio/export && \
-		echo out > /sys/class/gpio/gpio8/direction && \
-		echo 1 > /sys/class/gpio/gpio8/value && \
+		echo 8 > /sys/class/gpio/export; \
+		echo out > /sys/class/gpio/gpio8/direction; \
+		echo 1 > /sys/class/gpio/gpio8/value; \
+		echo 8 > /sys/class/gpio/unexport)
+
+reset:
+	$(shell \
+		echo 8 > /sys/class/gpio/unexport; \
+		echo 8 > /sys/class/gpio/export; \
+		echo out > /sys/class/gpio/gpio8/direction; \
+		echo 0 > /sys/class/gpio/gpio8/value; \
+		sleep 2; \
+		echo 1 > /sys/class/gpio/gpio8/value; \
 		echo 8 > /sys/class/gpio/unexport)
 
 clean:
