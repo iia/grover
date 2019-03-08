@@ -3,7 +3,6 @@
 
 #define DEBUG_UART true
 
-void debug_uart_tx_char(char c);
 void debug_uart_tx_string(char* s);
 void debug_uart_init(uint32_t baud);
 

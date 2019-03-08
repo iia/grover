@@ -11,7 +11,7 @@
 void i2c_init(uint8_t i2c_address) {
 	debug_uart_tx_string("[+] I2C: I2C init\r\n\0");
 	TWAR = (i2c_address << 1); // Disable general call.
-	TWCR |= _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWEN);
+	TWCR |= (_BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWEN));
 }
 
 ISR(TWI_vect) {
