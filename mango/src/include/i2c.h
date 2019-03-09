@@ -4,8 +4,6 @@
 #include <stdbool.h>
 
 #define I2C_ADDRESS 42
-#define RST_INT_DIS_ACK (_BV(TWINT) & ~_BV(TWEA))
-#define RST_INT_ENA_ACK (_BV(TWINT) | _BV(TWEA))
 
 #define IDX_FID 3
 #define LEN_FID 1
