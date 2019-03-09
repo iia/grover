@@ -3,101 +3,101 @@
 void port_handler_return_data(int8_t ret, uint8_t fid, uint8_t* data) {
 	debug_uart_tx_string("[+] PORTS: Handler return\r\n\0");
 
-	memset(&ctx_port_handler.buffer, 0, LEN_BUF_I2C);
+	memset(&ctx_mango.i2c.buffer, 0, LEN_BUF_I2C);
 
-	ctx_port_handler.buffer[IDX_PRT_RET] = ret;
-	ctx_port_handler.buffer[IDX_FID] = fid;
+	ctx_mango.i2c.buffer[IDX_PRT_RET] = ret;
+	ctx_mango.i2c.buffer[IDX_FID] = fid;
 
 	if (data != NULL) {
-		memcpy(&ctx_port_handler.buffer[IDX_DAT], data, LEN_DAT);
+		memcpy(&ctx_mango.i2c.buffer[IDX_DAT], data, LEN_DAT);
 	}
 }
 
 void port_handler_A0() {
 	debug_uart_tx_string("[+] PORTS: Handler A0\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_A1() {
 	debug_uart_tx_string("[+] PORTS: Handler A1\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_A2() {
 	debug_uart_tx_string("[+] PORTS: Handler A2\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_serial() {
 	debug_uart_tx_string("[+] PORTS: Handler serial\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_D2() {
 	debug_uart_tx_string("[+] PORTS: Handler D2\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_D3() {
 	debug_uart_tx_string("[+] PORTS: Handler D3\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_D4() {
 	debug_uart_tx_string("[+] PORTS: Handler D4\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_D5() {
 	debug_uart_tx_string("[+] PORTS: Handler D5\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_D6() {
 	debug_uart_tx_string("[+] PORTS: Handler D6\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_D7() {
 	debug_uart_tx_string("[+] PORTS: Handler D7\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		/*
 		Channel 0 = PD7
 		Channel 1 = PB0
@@ -114,7 +114,7 @@ void port_handler_D7() {
 
 			DDRD &= ~_BV(PIND7);
 
-			port_handler_return_data((int8_t)FID_RET_OK, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -123,7 +123,7 @@ void port_handler_D7() {
 
 			DDRD |= _BV(PORTD7);
 
-			port_handler_return_data((int8_t)FID_RET_OK, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -131,7 +131,7 @@ void port_handler_D7() {
 			DDRD &= ~_BV(PIND7);
 			PORTD |= _BV(PORTD7);
 
-			port_handler_return_data((int8_t)FID_RET_OK, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -142,18 +142,18 @@ void port_handler_D7() {
 			debug_uart_tx_string("[+] PORTS: Handler D7: CH0_SET_VAL\r\n\0");
 
 			// TODO: Check current direction first and then set accordingly!
-			if (ctx_port_handler.data[(LEN_DAT - 1)] == 1) {
+			if (ctx_mango.port.data[(LEN_DAT - 1)] == 1) {
 				PORTD |= _BV(PORTD7);
 
-				port_handler_return_data((int8_t)FID_RET_OK, ctx_port_handler.fid, NULL);
+				port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 			}
-			else if (ctx_port_handler.data[(LEN_DAT - 1)] == 0) {
+			else if (ctx_mango.port.data[(LEN_DAT - 1)] == 0) {
 				PORTD &= ~_BV(PORTD7);
 
-				port_handler_return_data((int8_t)FID_RET_OK, ctx_port_handler.fid, NULL);
+				port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 			}
 			else {
-				port_handler_return_data((int8_t)FID_RET_ERR_INV_DAT, ctx_port_handler.fid, NULL);
+				port_handler_return_data((int8_t)FID_RET_ERR_INV_DAT, ctx_mango.port.fid, NULL);
 			}
 
 			break;
@@ -180,16 +180,16 @@ void port_handler_D7() {
 			break;
 
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
 void port_handler_D8() {
 	debug_uart_tx_string("[+] PORTS: Handler D8\r\n\0");
 
-	switch (ctx_port_handler.fid) {
+	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_port_handler.fid, NULL);
+			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 

@@ -22,14 +22,22 @@
 #define LEN_BUF_I2C 8
 
 typedef struct {
+	uint8_t idx_buffer;
+	uint8_t buffer[LEN_BUF_I2C];
+} CTX_MANGO_I2C_t;
+
+typedef struct {
 	uint8_t fid;
 	uint8_t port;
 	bool is_valid_data;
-	uint8_t idx_buffer;
 	uint8_t data[LEN_DAT];
-	uint8_t buffer[LEN_BUF_I2C];
+} CTX_MANGO_PORT_t;
+
+typedef struct {
+	CTX_MANGO_I2C_t i2c;
+	CTX_MANGO_PORT_t port;
 } CTX_MANGO_t;
 
-extern CTX_MANGO_t ctx_port_handler;
+extern CTX_MANGO_t ctx_mango;
 
 #endif // MANGO_H
