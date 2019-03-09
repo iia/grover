@@ -7,21 +7,22 @@
 #define RST_INT_DIS_ACK (_BV(TWINT) & ~_BV(TWEA))
 #define RST_INT_ENA_ACK (_BV(TWINT) | _BV(TWEA))
 
-#define RX_BUF_IDX_PRT 0
-#define RX_BUF_IDX_FID 1
-#define RX_BUF_IDX_DAT 2
-#define RX_BUF_LEN_PRT 1
-#define RX_BUF_LEN_FID 1
-#define RX_BUF_LEN_DAT 4
-#define RX_TX_BUF_LEN 6
+#define IDX_FID 3
+#define LEN_FID 1
+#define IDX_DAT 4
+#define LEN_DAT 4
+#define IDX_PRT_RET 2
+#define LEN_PRT_RET 1
+
+#define LEN_BUF_I2C 8
 
 struct {
-	uint8_t rx_fid;
-	uint8_t rx_port;
-	bool rx_tx_data_valid;
-	uint8_t rx_tx_buffer_idx;
-	uint8_t rx_tx_buffer[RX_TX_BUF_LEN];
-	uint8_t rx_data[RX_BUF_LEN_DAT];
+	uint8_t fid;
+	uint8_t port;
+	bool is_valid_data;
+	uint8_t idx_buffer;
+	uint8_t data[LEN_DAT];
+	uint8_t buffer[LEN_BUF_I2C];
 } ctx_port_handler;
 
 void i2c_init(uint8_t i2c_address);

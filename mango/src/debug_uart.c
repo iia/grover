@@ -13,6 +13,9 @@ void debug_uart_tx_string(char* s) {
 			the I2C interrupt. Which is clearly the wrong place to clear the
 			interrupt and causes I2C bus problems.
 
+			Currently UART is configured with all interrupts disabled but that
+			does not seem to help.
+
 			The actual reason for this is still not clear.
 		*/
 		TWCR &= ~_BV(TWIE);

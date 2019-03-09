@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <string.h>
-
 #include <compat/twi.h>
 #include <avr/interrupt.h>
 
@@ -16,14 +15,15 @@ void i2c_init(uint8_t i2c_address) {
 
 ISR(TWI_vect) {
 	switch((TWSR & 0xFC)) {
-		// Slave RX (Write GrovePi).
+		// Slave RX.
 
 		// TWSR = 0x60 (RX: START+ADDR+W, TX: ACK).
 		case TW_SR_SLA_ACK:
 			debug_uart_tx_string("[+] I2C: TW_SR_SLA_ACK: ACK -->\r\n\0");
 
-			ctx_port_handler.rx_tx_buffer_idx = 0;
-			ctx_port_handler.rx_tx_data_valid = false;
+			ctx_port_handler.idx_buffer = 0;
+			ctx_port_handler.is_valid_data = false;
+
 			TWCR |= RST_INT_ENA_ACK;
 
 			break;
@@ -32,18 +32,23 @@ ISR(TWI_vect) {
 		case TW_SR_DATA_ACK:
 			debug_uart_tx_string("[+] I2C: TW_SR_DATA_ACK\r\n\0");
 
-			if (ctx_port_handler.rx_tx_buffer_idx == RX_TX_BUF_LEN - 1) {
+			if (ctx_port_handler.idx_buffer < (LEN_BUF_I2C - 1)) {
+				debug_uart_tx_string("[+] I2C: TW_SR_DATA_ACK: ACK -->\r\n\0");
+
+				ctx_port_handler.buffer[ctx_port_handler.idx_buffer] = TWDR;
+				ctx_port_handler.idx_buffer++;
+
+				TWCR |= RST_INT_ENA_ACK;
+			}
+			else if (ctx_port_handler.idx_buffer == (LEN_BUF_I2C - 1)) {
 				debug_uart_tx_string("[+] I2C: TW_SR_DATA_ACK: NACK -->\r\n\0");
 
-				ctx_port_handler.rx_tx_buffer[ctx_port_handler.rx_tx_buffer_idx] = TWDR;
+				ctx_port_handler.buffer[ctx_port_handler.idx_buffer] = TWDR;
+
 				TWCR |= RST_INT_DIS_ACK;
 			}
 			else {
-				debug_uart_tx_string("[+] I2C: TW_SR_DATA_ACK: ACK -->\r\n\0");
-
-				ctx_port_handler.rx_tx_buffer[ctx_port_handler.rx_tx_buffer_idx] = TWDR;
-				ctx_port_handler.rx_tx_buffer_idx++;
-				TWCR |= RST_INT_ENA_ACK;
+				TWCR |= RST_INT_DIS_ACK;
 			}
 
 			break;
@@ -52,7 +57,8 @@ ISR(TWI_vect) {
 		case TW_SR_DATA_NACK:
 			debug_uart_tx_string("[+] I2C: TW_SR_DATA_NACK: NACK -->\r\n\0");
 
-			ctx_port_handler.rx_tx_buffer_idx = 0;
+			ctx_port_handler.idx_buffer = 0;
+
 			TWCR |= RST_INT_DIS_ACK;
 
 			break;
@@ -61,56 +67,54 @@ ISR(TWI_vect) {
 		case TW_SR_STOP:
 			debug_uart_tx_string("[+] I2C: TW_SR_STOP: ACK -->\r\n\0");
 
-			if (ctx_port_handler.rx_tx_buffer_idx == RX_TX_BUF_LEN - 1) {
-				ctx_port_handler.rx_tx_data_valid = true;
-
+			if (ctx_port_handler.idx_buffer == LEN_BUF_I2C - 1) {
 				memcpy(
-					&ctx_port_handler.rx_port,
-					&ctx_port_handler.rx_tx_buffer[RX_BUF_IDX_PRT],
-					RX_BUF_LEN_PRT
+					&ctx_port_handler.port,
+					&ctx_port_handler.buffer[IDX_PRT_RET],
+					LEN_PRT_RET
 				);
 
 				memcpy(
-					&ctx_port_handler.rx_fid,
-					&ctx_port_handler.rx_tx_buffer[RX_BUF_IDX_FID],
-					RX_BUF_LEN_FID
+					&ctx_port_handler.fid,
+					&ctx_port_handler.buffer[IDX_FID],
+					LEN_FID
 				);
 
 				memcpy(
-					&ctx_port_handler.rx_data,
-					&ctx_port_handler.rx_tx_buffer[RX_BUF_IDX_DAT],
-					RX_BUF_LEN_DAT
+					&ctx_port_handler.data,
+					&ctx_port_handler.buffer[IDX_DAT],
+					LEN_DAT
 				);
 
-				port_handler[ctx_port_handler.rx_port](ctx_port_handler.rx_fid);
+				ctx_port_handler.is_valid_data = true;
+
+				port_handler[ctx_port_handler.port]();
 			}
 			else {
-				ctx_port_handler.rx_tx_data_valid = false;
-
-				memset(&ctx_port_handler.rx_tx_buffer, 0, RX_TX_BUF_LEN);
-
-				ctx_port_handler.rx_tx_buffer[1] = (int8_t)FID_RET_ERR_INV_DAT;
+				ctx_port_handler.is_valid_data = false;
 			}
 
 			TWCR |= RST_INT_ENA_ACK;
 
 			break;
 
-		// Slave TX (Read GrovePi).
+		// Slave TX.
 
 		// TWSR = 0xA8 (RX: START+ADDR+R, TX: ACK).
 		case TW_ST_SLA_ACK:
 			debug_uart_tx_string("[+] I2C: TW_ST_SLA_ACK: ACK -->\r\n\0");
 
-			ctx_port_handler.rx_tx_buffer_idx = 0;
+			ctx_port_handler.idx_buffer = 0;
 
-			if (!ctx_port_handler.rx_tx_data_valid) {
-				memset(&ctx_port_handler.rx_tx_buffer, 0, RX_TX_BUF_LEN);
-				ctx_port_handler.rx_tx_buffer[1] = (int8_t)FID_RET_ERR_INV_DAT;
+			if (!ctx_port_handler.is_valid_data) {
+				memset(&ctx_port_handler.buffer, 0, LEN_BUF_I2C);
+
+				ctx_port_handler.buffer[IDX_PRT_RET] = (int8_t)FID_RET_ERR_INV_DAT;
 			}
 
-			TWDR = ctx_port_handler.rx_tx_buffer[ctx_port_handler.rx_tx_buffer_idx];
-			ctx_port_handler.rx_tx_buffer_idx++;
+			TWDR = ctx_port_handler.buffer[ctx_port_handler.idx_buffer];
+
+			ctx_port_handler.idx_buffer++;
 
 			TWCR |= RST_INT_ENA_ACK;
 
@@ -118,20 +122,23 @@ ISR(TWI_vect) {
 
 		// TWSR = 0xB8 (RX: ACK, TX: TWDR).
 		case TW_ST_DATA_ACK:
-			debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: ACK -->\r\n\0");
+			debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: ACK\r\n\0");
 
-			if (ctx_port_handler.rx_tx_buffer_idx == RX_TX_BUF_LEN - 1) {
+			if (ctx_port_handler.idx_buffer < (LEN_BUF_I2C - 1)) {
+				debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: ACK -->\r\n\0");
+
+				TWDR = ctx_port_handler.buffer[ctx_port_handler.idx_buffer];
+				ctx_port_handler.idx_buffer++;
+				TWCR |= RST_INT_ENA_ACK;
+			}
+			else if (ctx_port_handler.idx_buffer == (LEN_BUF_I2C - 1)) {
 				debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: NACK -->\r\n\0");
 
-				TWDR = ctx_port_handler.rx_tx_buffer[ctx_port_handler.rx_tx_buffer_idx];
+				TWDR = ctx_port_handler.buffer[ctx_port_handler.idx_buffer];
 				TWCR |= RST_INT_DIS_ACK;
 			}
 			else {
-				debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: ACK -->\r\n\0");
-
-				TWDR = ctx_port_handler.rx_tx_buffer[ctx_port_handler.rx_tx_buffer_idx];
-				ctx_port_handler.rx_tx_buffer_idx++;
-				TWCR |= RST_INT_ENA_ACK;
+				TWCR |= RST_INT_DIS_ACK;
 			}
 
 			break;
@@ -142,14 +149,14 @@ ISR(TWI_vect) {
 			// Reset internal data.
 			debug_uart_tx_string("[+] I2C: TW_ST_DATA_NACK/TW_ST_LAST_DATA: ACK -->\r\n\0");
 
-			ctx_port_handler.rx_tx_buffer_idx = 0;
-			ctx_port_handler.rx_tx_data_valid = false;
+			ctx_port_handler.idx_buffer = 0;
+			ctx_port_handler.is_valid_data = false;
 
 			TWCR |= RST_INT_ENA_ACK;
 
 			break;
 
 		default:
-			TWCR |= RST_INT_DIS_ACK;
+			TWCR |= RST_INT_ENA_ACK;
 	}
 }

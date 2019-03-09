@@ -4,10 +4,9 @@
 
 #include "i2c.h"
 #include "mango.h"
-#include "ports.h"
 #include "debug_uart.h"
 
-int main(void) {
+int main() {
 	cli();
 
 	debug_uart_init(9600);
