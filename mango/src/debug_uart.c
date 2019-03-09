@@ -7,19 +7,14 @@
 void debug_uart_tx_string(char* s) {
 	#if DEBUG_UART == true
 		/*
-		FIXME:
-			Disabling I2C(TWI) here because if a string is being TXed from
-			an I2C ISR handler then for some reason writing to UDR0 clears
-			the I2C interrupt. Which is clearly the wrong place to clear the
-			interrupt and causes I2C bus problems.
-
-			Currently UART is configured with all interrupts disabled but that
-			does not seem to help.
+		NOTE:
+			Tried to use this function to TX USART for debugging while in the TWI
+			ISR. Even though all interrupts of the USART were disabled it still
+			did not work properly(interfered with TWI hardware). Possible silicon
+			bug?
 
 			The actual reason for this is still not clear.
 		*/
-		TWCR &= ~_BV(TWIE);
-
 		while (*s != '\0') {
 			while (!(UCSR0A & _BV(UDRE0))) {
 				;
@@ -28,8 +23,6 @@ void debug_uart_tx_string(char* s) {
 			UDR0 = *s;
 			++s;
 		}
-
-		TWCR |= _BV(TWIE);
 	#endif
 }
 
@@ -40,7 +33,9 @@ void debug_uart_init(uint32_t baud) {
 
 		UBRR0H = (uint8_t)(ubrr & 0x0F00);
 		UBRR0L = (uint8_t)(ubrr & 0x00FF);
-		UCSR0B |= (_BV(TXEN0) & ~_BV(RXEN0) & ~_BV(RXCIE0) & ~_BV(TXCIE0) & ~_BV(UDRIE0));
-		UCSR0C = (3 << UCSZ00);
+
+		UCSR0B |= (uint8_t)((_BV(TXEN0)));
+		UCSR0B &= (uint8_t)(~(_BV(RXEN0) & ~(_BV(RXCIE0)) & ~(_BV(TXCIE0)) & ~(_BV(UDRIE0))));
+		UCSR0C |= (_BV(UCSZ00) | _BV(UCSZ01));
 	#endif
 }

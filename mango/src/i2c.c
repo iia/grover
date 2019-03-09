@@ -14,14 +14,17 @@ void i2c_init(uint8_t i2c_address) {
 	TWCR |= (uint8_t)((_BV(TWIE)) | (_BV(TWEN)) | (_BV(TWEA)) | (_BV(TWINT)));
 }
 
+/*
+NOTE:
+	Do not use the USART interface (debug_uart_tx_string) or use any hardware
+	peripherals from within the interrupt handler!
+*/
 ISR(TWI_vect) {
 	switch((TWSR & 0xFC)) {
 		// Slave RX.
 
 		// TWSR = 0x60 (RX: START+ADDR+W, TX: ACK).
 		case TW_SR_SLA_ACK:
-			debug_uart_tx_string("[+] I2C: TW_SR_SLA_ACK: ACK -->\r\n\0");
-
 			ctx_port_handler.idx_buffer = 0;
 			ctx_port_handler.is_valid_data = false;
 
@@ -32,11 +35,7 @@ ISR(TWI_vect) {
 
 		// TWSR = 0x80 (Got TW_SR_SLA_ACK previously) (RX: DATA, TX: ACK).
 		case TW_SR_DATA_ACK:
-			debug_uart_tx_string("[+] I2C: TW_SR_DATA_ACK\r\n\0");
-
 			if (ctx_port_handler.idx_buffer < (LEN_BUF_I2C - 1)) {
-				debug_uart_tx_string("[+] I2C: TW_SR_DATA_ACK: ACK -->\r\n\0");
-
 				ctx_port_handler.buffer[ctx_port_handler.idx_buffer] = TWDR;
 				ctx_port_handler.idx_buffer++;
 
@@ -44,8 +43,6 @@ ISR(TWI_vect) {
 				TWCR |= (uint8_t)((_BV(TWEA)) | (_BV(TWINT)));
 			}
 			else if (ctx_port_handler.idx_buffer == (LEN_BUF_I2C - 1)) {
-				debug_uart_tx_string("[+] I2C: TW_SR_DATA_ACK: NACK -->\r\n\0");
-
 				ctx_port_handler.buffer[ctx_port_handler.idx_buffer] = TWDR;
 
 				// Reset interrupt and disable ACK.
@@ -62,8 +59,6 @@ ISR(TWI_vect) {
 
 		// TWSR = 0x88 (Got TW_SR_SLA_ACK previously) (RX: DATA, TX: NACK).
 		case TW_SR_DATA_NACK:
-			debug_uart_tx_string("[+] I2C: TW_SR_DATA_NACK: NACK -->\r\n\0");
-
 			ctx_port_handler.idx_buffer = 0;
 
 			// Reset interrupt and disable ACK.
@@ -74,8 +69,6 @@ ISR(TWI_vect) {
 
 		// TWSR = 0xA0 (RX: Got STOP/RSTART while being addressed as slave, TX: N/A).
 		case TW_SR_STOP:
-			debug_uart_tx_string("[+] I2C: TW_SR_STOP: ACK -->\r\n\0");
-
 			if (ctx_port_handler.idx_buffer == LEN_BUF_I2C - 1) {
 				memcpy(
 					&ctx_port_handler.port,
@@ -112,8 +105,6 @@ ISR(TWI_vect) {
 
 		// TWSR = 0xA8 (RX: START+ADDR+R, TX: ACK).
 		case TW_ST_SLA_ACK:
-			debug_uart_tx_string("[+] I2C: TW_ST_SLA_ACK: ACK -->\r\n\0");
-
 			ctx_port_handler.idx_buffer = 0;
 
 			if (!ctx_port_handler.is_valid_data) {
@@ -133,11 +124,7 @@ ISR(TWI_vect) {
 
 		// TWSR = 0xB8 (RX: ACK, TX: TWDR).
 		case TW_ST_DATA_ACK:
-			debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: ACK\r\n\0");
-
 			if (ctx_port_handler.idx_buffer < (LEN_BUF_I2C - 1)) {
-				debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: ACK -->\r\n\0");
-
 				TWDR = ctx_port_handler.buffer[ctx_port_handler.idx_buffer];
 
 				ctx_port_handler.idx_buffer++;
@@ -146,8 +133,6 @@ ISR(TWI_vect) {
 				TWCR |= (uint8_t)((_BV(TWEA)) | (_BV(TWINT)));
 			}
 			else if (ctx_port_handler.idx_buffer == (LEN_BUF_I2C - 1)) {
-				debug_uart_tx_string("[+] I2C: TW_ST_DATA_ACK: NACK -->\r\n\0");
-
 				TWDR = ctx_port_handler.buffer[ctx_port_handler.idx_buffer];
 
 				// Reset interrupt and disable ACK.
@@ -166,8 +151,6 @@ ISR(TWI_vect) {
 		case TW_ST_DATA_NACK:
 		case TW_ST_LAST_DATA:
 			// Reset internal data.
-			debug_uart_tx_string("[+] I2C: TW_ST_DATA_NACK/TW_ST_LAST_DATA: ACK -->\r\n\0");
-
 			ctx_port_handler.idx_buffer = 0;
 			ctx_port_handler.is_valid_data = false;
 
