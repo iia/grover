@@ -1,11 +1,4 @@
-#include <stdint.h>
-#include <string.h>
-#include <compat/twi.h>
-#include <avr/interrupt.h>
-
-#include "i2c.h"
-#include "ports.h"
-#include "debug_uart.h"
+#include "mango.h"
 
 void i2c_init(uint8_t i2c_address) {
 	debug_uart_tx_string("[+] I2C: I2C init\r\n\0");

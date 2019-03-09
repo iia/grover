@@ -1,8 +1,4 @@
-#include <stdint.h>
-#include <stdbool.h>
-#include <avr/io.h>
-
-#include "debug_uart.h"
+#include "mango.h"
 
 void debug_uart_tx_string(char* s) {
 	#if DEBUG_UART == true

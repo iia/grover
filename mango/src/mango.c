@@ -1,10 +1,6 @@
-#include <stdint.h>
-#include <string.h>
-#include <avr/interrupt.h>
-
-#include "i2c.h"
 #include "mango.h"
-#include "debug_uart.h"
+
+CTX_MANGO_t ctx_port_handler;
 
 int main() {
 	cli();

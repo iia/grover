@@ -1,10 +1,4 @@
-#include <stdint.h>
-#include <string.h>
-#include <avr/io.h>
-
-#include "i2c.h"
-#include "ports.h"
-#include "debug_uart.h"
+#include "mango.h"
 
 void port_handler_return_data(int8_t ret, uint8_t fid, uint8_t* data) {
 	debug_uart_tx_string("[+] PORTS: Handler return\r\n\0");
