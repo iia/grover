@@ -1,5 +1,9 @@
 #include "mango.h"
 
+static void i2c_isr_load_response_inv_prt(void) {
+	i2c_load_response((int8_t)FID_RET_ERR_INV_PRT, 0x00, NULL);
+}
+
 void i2c_init(uint8_t i2c_address) {
 	debug_uart_tx_string("[+] I2C: I2C init\r\n\0");
 
@@ -7,9 +11,22 @@ void i2c_init(uint8_t i2c_address) {
 	TWCR |= (uint8_t)((_BV(TWIE)) | (_BV(TWEN)) | (_BV(TWEA)) | (_BV(TWINT)));
 }
 
+void i2c_load_response(int8_t ret, uint8_t fid, uint8_t* data) {
+	debug_uart_tx_string("[+] I2C: Load response\r\n\0");
+
+	memset(&ctx_mango.i2c.buffer, 0, LEN_BUF_I2C);
+
+	ctx_mango.i2c.buffer[IDX_PRT_RET] = ret;
+	ctx_mango.i2c.buffer[IDX_FID] = fid;
+
+	if (data != NULL) {
+		memcpy(&ctx_mango.i2c.buffer[IDX_DAT], data, LEN_DAT);
+	}
+}
+
 /*
 NOTE:
-	Do not use the USART interface (debug_uart_tx_string) or use any hardware
+	Do not use the USART interface (debug_uart_tx_string()) or any hardware
 	peripherals from within the interrupt handler!
 */
 ISR(TWI_vect) {
@@ -39,13 +56,13 @@ ISR(TWI_vect) {
 				ctx_mango.i2c.buffer[ctx_mango.i2c.idx_buffer] = TWDR;
 
 				// Reset interrupt and disable ACK.
-				TWCR |= (uint8_t)((_BV(TWINT)));
 				TWCR &= (uint8_t)(~(_BV(TWEA)));
+				TWCR |= (uint8_t)((_BV(TWINT)));
 			}
 			else {
 				// Reset interrupt and disable ACK.
-				TWCR |= (uint8_t)((_BV(TWINT)));
 				TWCR &= (uint8_t)(~(_BV(TWEA)));
+				TWCR |= (uint8_t)((_BV(TWINT)));
 			}
 
 			break;
@@ -55,42 +72,52 @@ ISR(TWI_vect) {
 			ctx_mango.i2c.idx_buffer = 0;
 
 			// Reset interrupt and disable ACK.
-			TWCR |= (uint8_t)((_BV(TWINT)));
 			TWCR &= (uint8_t)(~(_BV(TWEA)));
+			TWCR |= (uint8_t)((_BV(TWINT)));
 
 			break;
 
-		// TWSR = 0xA0 (RX: Got STOP/RSTART while being addressed as slave, TX: N/A).
+		// TWSR = 0xA0 (RX: STOP/RSTART , TX: N/A).
 		case TW_SR_STOP:
-			if (ctx_mango.i2c.idx_buffer == LEN_BUF_I2C - 1) {
+			if (ctx_mango.i2c.idx_buffer == (LEN_BUF_I2C - 1)) {
 				memcpy(
 					&ctx_mango.port.port,
 					&ctx_mango.i2c.buffer[IDX_PRT_RET],
 					LEN_PRT_RET
 				);
 
-				memcpy(
-					&ctx_mango.port.fid,
-					&ctx_mango.i2c.buffer[IDX_FID],
-					LEN_FID
-				);
+				if (ctx_mango.port.port < GROVEPI_PORTS) {
+					ctx_mango.port.is_valid_data = true;
 
-				memcpy(
-					&ctx_mango.port.data,
-					&ctx_mango.i2c.buffer[IDX_DAT],
-					LEN_DAT
-				);
+					memcpy(
+						&ctx_mango.port.fid,
+						&ctx_mango.i2c.buffer[IDX_FID],
+						LEN_FID
+					);
 
-				ctx_mango.port.is_valid_data = true;
+					memcpy(
+						&ctx_mango.port.data,
+						&ctx_mango.i2c.buffer[IDX_DAT],
+						LEN_DAT
+					);
 
-				port_handler[ctx_mango.port.port]();
+					ctx_mango.task_port = port_handler[ctx_mango.port.port];
+				}
+				else {
+					ctx_mango.port.is_valid_data = false;
+					ctx_mango.task_i2c_isr_response = &i2c_isr_load_response_inv_prt;
+				}
+
+				// Reset interrupt and disable ACK (ACK will be re-enabled after the task execution).
+				TWCR &= (uint8_t)(~(_BV(TWEA)));
+				TWCR |= (uint8_t)((_BV(TWINT)));
 			}
 			else {
 				ctx_mango.port.is_valid_data = false;
-			}
 
-			// Reset interrupt and enable ACK.
-			TWCR |= (uint8_t)((_BV(TWEA)) | (_BV(TWINT)));
+				// Reset interrupt and enable ACK.
+				TWCR |= (uint8_t)((_BV(TWEA)) | (_BV(TWINT)));
+			}
 
 			break;
 
@@ -99,12 +126,6 @@ ISR(TWI_vect) {
 		// TWSR = 0xA8 (RX: START+ADDR+R, TX: ACK).
 		case TW_ST_SLA_ACK:
 			ctx_mango.i2c.idx_buffer = 0;
-
-			if (!ctx_mango.port.is_valid_data) {
-				memset(&ctx_mango.i2c.buffer, 0, LEN_BUF_I2C);
-
-				ctx_mango.i2c.buffer[IDX_PRT_RET] = (int8_t)FID_RET_ERR_INV_DAT;
-			}
 
 			TWDR = ctx_mango.i2c.buffer[ctx_mango.i2c.idx_buffer];
 
@@ -129,13 +150,14 @@ ISR(TWI_vect) {
 				TWDR = ctx_mango.i2c.buffer[ctx_mango.i2c.idx_buffer];
 
 				// Reset interrupt and disable ACK.
-				TWCR |= (uint8_t)((_BV(TWINT)));
 				TWCR &= (uint8_t)(~(_BV(TWEA)));
+				TWCR |= (uint8_t)((_BV(TWINT)));
+
 			}
 			else {
 				// Reset interrupt and disable ACK.
-				TWCR |= (uint8_t)((_BV(TWINT)));
 				TWCR &= (uint8_t)(~(_BV(TWEA)));
+				TWCR |= (uint8_t)((_BV(TWINT)));
 			}
 
 			break;

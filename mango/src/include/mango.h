@@ -7,19 +7,14 @@
 
 #include <avr/io.h>
 #include <compat/twi.h>
+#include <util/atomic.h>
 #include <avr/interrupt.h>
 
 #include "i2c.h"
 #include "ports.h"
 #include "debug_uart.h"
 
-#define IDX_FID 3
-#define LEN_FID 1
-#define IDX_DAT 4
-#define LEN_DAT 4
-#define IDX_PRT_RET 2
-#define LEN_PRT_RET 1
-#define LEN_BUF_I2C 8
+typedef void (*TASK_I2C_ISR_RESPONSE_t)(void);
 
 typedef struct {
 	uint8_t idx_buffer;
@@ -36,6 +31,13 @@ typedef struct {
 typedef struct {
 	CTX_MANGO_I2C_t i2c;
 	CTX_MANGO_PORT_t port;
+
+	/*
+	Must be volatile as we set the reference to
+	the function from the TWI ISR.
+	*/
+	volatile TASK_PORT_t task_port;
+	volatile TASK_I2C_ISR_RESPONSE_t task_i2c_isr_response;
 } CTX_MANGO_t;
 
 extern CTX_MANGO_t ctx_mango;

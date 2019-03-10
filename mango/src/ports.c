@@ -1,24 +1,11 @@
 #include "mango.h"
 
-void port_handler_return_data(int8_t ret, uint8_t fid, uint8_t* data) {
-	debug_uart_tx_string("[+] PORTS: Handler return\r\n\0");
-
-	memset(&ctx_mango.i2c.buffer, 0, LEN_BUF_I2C);
-
-	ctx_mango.i2c.buffer[IDX_PRT_RET] = ret;
-	ctx_mango.i2c.buffer[IDX_FID] = fid;
-
-	if (data != NULL) {
-		memcpy(&ctx_mango.i2c.buffer[IDX_DAT], data, LEN_DAT);
-	}
-}
-
 void port_handler_A0() {
 	debug_uart_tx_string("[+] PORTS: Handler A0\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -27,7 +14,7 @@ void port_handler_A1() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -36,7 +23,7 @@ void port_handler_A2() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -45,7 +32,7 @@ void port_handler_serial() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -54,7 +41,7 @@ void port_handler_D2() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -63,7 +50,7 @@ void port_handler_D3() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -72,7 +59,7 @@ void port_handler_D4() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -81,7 +68,7 @@ void port_handler_D5() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -90,7 +77,7 @@ void port_handler_D6() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -114,7 +101,7 @@ void port_handler_D7() {
 
 			DDRD &= ~_BV(PIND7);
 
-			port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -123,15 +110,17 @@ void port_handler_D7() {
 
 			DDRD |= _BV(PORTD7);
 
-			port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
 		case FID_PORT_D7_CH0_SET_CFG_DIN_PUP:
+			debug_uart_tx_string("[+] PORTS: Handler D7: CH0_SET_CFG_DIN_PUP\r\n\0");
+
 			DDRD &= ~_BV(PIND7);
 			PORTD |= _BV(PORTD7);
 
-			port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -145,15 +134,15 @@ void port_handler_D7() {
 			if (ctx_mango.port.data[(LEN_DAT - 1)] == 1) {
 				PORTD |= _BV(PORTD7);
 
-				port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+				i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 			}
 			else if (ctx_mango.port.data[(LEN_DAT - 1)] == 0) {
 				PORTD &= ~_BV(PORTD7);
 
-				port_handler_return_data((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+				i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
 			}
 			else {
-				port_handler_return_data((int8_t)FID_RET_ERR_INV_DAT, ctx_mango.port.fid, NULL);
+				i2c_load_response((int8_t)FID_RET_ERR_INV_DAT, ctx_mango.port.fid, NULL);
 			}
 
 			break;
@@ -180,7 +169,7 @@ void port_handler_D7() {
 			break;
 
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -189,11 +178,11 @@ void port_handler_D8() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			port_handler_return_data((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
-PORT_HANDLER_t port_handler[GROVEPI_PORTS] =
+TASK_PORT_t port_handler[GROVEPI_PORTS] =
 	{
 		&port_handler_A0,
 		&port_handler_A1,

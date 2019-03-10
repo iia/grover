@@ -5,8 +5,9 @@
 
 // FID return values.
 #define FID_RET_OK           0
-#define FID_RET_ERR_INV_FID -1
-#define FID_RET_ERR_INV_DAT -2
+#define FID_RET_ERR_INV_PRT -1
+#define FID_RET_ERR_INV_FID -2
+#define FID_RET_ERR_INV_DAT -3
 
 typedef enum {
 	FID_PORT_A0_CH0_ = 0x01,
@@ -73,9 +74,9 @@ typedef enum {
 	FID_PORT_D8_CH1_ = 0x02
 } FID_PORT_D8_t;
 
-typedef void (*PORT_HANDLER_t)(void);
+typedef void (*TASK_PORT_t)(void);
 
-PORT_HANDLER_t port_handler[GROVEPI_PORTS];
+TASK_PORT_t port_handler[GROVEPI_PORTS];
 
 void port_handler_A0(void);
 void port_handler_A1(void);
@@ -88,7 +89,5 @@ void port_handler_D5(void);
 void port_handler_D6(void);
 void port_handler_D7(void);
 void port_handler_D8(void);
-
-void port_handler_return_data(int8_t ret, uint8_t fid, uint8_t* data);
 
 #endif // PORTS_H
