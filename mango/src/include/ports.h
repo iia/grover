@@ -3,11 +3,11 @@
 
 #define GROVEPI_PORTS 11
 
-// FID return values.
-#define FID_RET_OK           0
-#define FID_RET_ERR_INV_PRT -1
-#define FID_RET_ERR_INV_FID -2
-#define FID_RET_ERR_INV_DAT -3
+// Function return values.
+#define PRT_RET_OK           0
+#define PRT_RET_ERR_INV_PRT -1
+#define PRT_RET_ERR_INV_FID -2
+#define PRT_RET_ERR_INV_DAT -3
 
 typedef enum {
 	FID_PORT_A0_CH0_ = 0x01,
@@ -58,14 +58,14 @@ typedef enum{
 	FID_PORT_D7_CH0_SET_CFG_DIN     = 0x01,
 	FID_PORT_D7_CH0_SET_CFG_DOU     = 0x02,
 	FID_PORT_D7_CH0_SET_CFG_DIN_PUP = 0x03,
-	FID_PORT_D7_CH0_GET_CFG         = 0x04,
-	FID_PORT_D7_CH0_SET_VAL         = 0x05,
+	FID_PORT_D7_CH0_SET_VAL         = 0x04,
+	FID_PORT_D7_CH0_GET_CFG         = 0x05,
 	FID_PORT_D7_CH0_GET_VAL         = 0x06,
 	FID_PORT_D7_CH1_SET_CFG_DIN     = 0x07,
 	FID_PORT_D7_CH1_SET_CFG_DOU     = 0x08,
 	FID_PORT_D7_CH1_SET_CFG_DIN_PUP = 0x09,
-	FID_PORT_D7_CH1_GET_CFG         = 0x0A,
-	FID_PORT_D7_CH1_SET_VAL         = 0x0B,
+	FID_PORT_D7_CH1_SET_VAL         = 0x0A,
+	FID_PORT_D7_CH1_GET_CFG         = 0x0B,
 	FID_PORT_D7_CH1_GET_VAL         = 0x0C
 } FID_PORT_D7_t;
 

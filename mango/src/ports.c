@@ -5,7 +5,7 @@ void port_handler_A0() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -14,7 +14,7 @@ void port_handler_A1() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -23,7 +23,7 @@ void port_handler_A2() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -32,7 +32,7 @@ void port_handler_serial() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -41,7 +41,7 @@ void port_handler_D2() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -50,7 +50,7 @@ void port_handler_D3() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -59,7 +59,7 @@ void port_handler_D4() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -68,7 +68,7 @@ void port_handler_D5() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -77,7 +77,7 @@ void port_handler_D6() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -101,7 +101,7 @@ void port_handler_D7() {
 
 			DDRD &= ~_BV(PIND7);
 
-			i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -110,7 +110,7 @@ void port_handler_D7() {
 
 			DDRD |= _BV(PORTD7);
 
-			i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -120,7 +120,7 @@ void port_handler_D7() {
 			DDRD &= ~_BV(PIND7);
 			PORTD |= _BV(PORTD7);
 
-			i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
@@ -134,15 +134,15 @@ void port_handler_D7() {
 			if (ctx_mango.port.data[(LEN_DAT - 1)] == 1) {
 				PORTD |= _BV(PORTD7);
 
-				i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+				i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
 			}
 			else if (ctx_mango.port.data[(LEN_DAT - 1)] == 0) {
 				PORTD &= ~_BV(PORTD7);
 
-				i2c_load_response((int8_t)FID_RET_OK, ctx_mango.port.fid, NULL);
+				i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
 			}
 			else {
-				i2c_load_response((int8_t)FID_RET_ERR_INV_DAT, ctx_mango.port.fid, NULL);
+				i2c_load_response((int8_t)PRT_RET_ERR_INV_DAT, ctx_mango.port.fid, NULL);
 			}
 
 			break;
@@ -169,7 +169,7 @@ void port_handler_D7() {
 			break;
 
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 
@@ -178,7 +178,7 @@ void port_handler_D8() {
 
 	switch (ctx_mango.port.fid) {
 		default:
-			i2c_load_response((int8_t)FID_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
 	}
 }
 

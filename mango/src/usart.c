@@ -2,10 +2,10 @@
 
 void usart_init() {
 	/*
-	USART config:
-		1. 8-N-1
-		2. TX only, RX disabled
-		3. All USART interrupt disabled
+	Configuration:
+		1. TX only mode, RX is disabled
+		2. All interrupts disabled
+		3. 8-N-1
 	*/
 	UBRR0H = (USART_BAUD_RATE >> 8);
 	UBRR0L = USART_BAUD_RATE;
@@ -18,7 +18,7 @@ void usart_init() {
 void usart_tx_debug(char* data) {
 	#if USART_DEBUG == true
 		while (*data != '\0') {
-			while (!(UCSR0A & _BV(UDRE0))) {
+			while (!(UCSR0A & (_BV(UDRE0)))) {
 				;
 			}
 

@@ -1,7 +1,7 @@
 #include "mango.h"
 
 static void i2c_isr_load_response_inv_prt(void) {
-	i2c_load_response((int8_t)FID_RET_ERR_INV_PRT, 0x00, NULL);
+	i2c_load_response((int8_t)PRT_RET_ERR_INV_PRT, 0x00, NULL);
 }
 
 void i2c_init(uint8_t i2c_address) {
@@ -24,13 +24,9 @@ void i2c_load_response(int8_t ret, uint8_t fid, uint8_t* data) {
 	}
 }
 
-/*
-NOTE:
-	Do not use the USART interface (usart_tx_debug()) or any hardware
-	peripherals from within the interrupt handler!
-*/
+// NOTE: Try to keep I2C ISR as fast as possible to avoid clock stretching.
 ISR(TWI_vect) {
-	switch((TWSR & 0xFC)) {
+	switch(TW_STATUS) {
 		// Slave RX.
 
 		// TWSR = 0x60 (RX: START+ADDR+W, TX: ACK).
@@ -101,10 +97,13 @@ ISR(TWI_vect) {
 						LEN_DAT
 					);
 
+					// Scheduling a port task.
 					ctx_mango.task_port = port_handler[ctx_mango.port.port];
 				}
 				else {
 					ctx_mango.port.is_valid_data = false;
+
+					// Scheduling a I2C ISR response load task.
 					ctx_mango.task_i2c_isr_response = &i2c_isr_load_response_inv_prt;
 				}
 

@@ -32,10 +32,7 @@ typedef struct {
 	CTX_MANGO_I2C_t i2c;
 	CTX_MANGO_PORT_t port;
 
-	/*
-	Must be volatile as we set the reference to
-	the function from the TWI ISR.
-	*/
+	// Must be volatile as we assign them in the I2C ISR.
 	volatile TASK_PORT_t task_port;
 	volatile TASK_I2C_ISR_RESPONSE_t task_i2c_isr_response;
 } CTX_MANGO_t;
