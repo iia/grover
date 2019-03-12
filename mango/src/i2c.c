@@ -24,7 +24,6 @@ void i2c_load_response(int8_t ret, uint8_t fid, uint8_t* data) {
 	}
 }
 
-// NOTE: Try to keep I2C ISR as fast as possible to avoid clock stretching.
 ISR(TWI_vect) {
 	switch(TW_STATUS) {
 		// Slave RX.

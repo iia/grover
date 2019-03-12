@@ -84,31 +84,22 @@ void port_handler_D6() {
 void port_handler_D7() {
 	usart_tx_debug("[+] PORTS: Handler D7\r\n\0");
 
+	uint8_t* data;
+
 	switch (ctx_mango.port.fid) {
 		/*
-		Channel 0 = PD7
-		Channel 1 = PB0
+		Port info:
+			Channels can be configured as digital I/O.
 
-		Input = 0
-		Output = 1
-
-		PORTx = 1 When pin is configured as input = PUEN
-		PORTx = 0 When pin is configured as input = PUD
+			Channel 0 = PD7.
+			Channel 1 = PB0.
 		*/
 
 		case FID_PORT_D7_CH0_SET_CFG_DIN:
 			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_CFG_DIN\r\n\0");
 
-			DDRD &= ~_BV(PIND7);
-
-			i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
-
-			break;
-
-		case FID_PORT_D7_CH0_SET_CFG_DOU:
-			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_CFG_DOU\r\n\0");
-
-			DDRD |= _BV(PORTD7);
+			DDRD &= ~(_BV(PORTD7));
+			PORTD &= ~(_BV(PORTD7));
 
 			i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
 
@@ -117,20 +108,32 @@ void port_handler_D7() {
 		case FID_PORT_D7_CH0_SET_CFG_DIN_PUP:
 			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_CFG_DIN_PUP\r\n\0");
 
-			DDRD &= ~_BV(PIND7);
-			PORTD |= _BV(PORTD7);
+			DDRD &= ~(_BV(PORTD7));
+			PORTD |= (_BV(PORTD7));
 
 			i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
 
 			break;
 
-		case FID_PORT_D7_CH0_GET_CFG:
+		case FID_PORT_D7_CH0_SET_CFG_DOU:
+			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_CFG_DOU\r\n\0");
+
+			DDRD |= (_BV(PORTD7));
+
+			i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, NULL);
+
 			break;
 
 		case FID_PORT_D7_CH0_SET_VAL:
 			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_VAL\r\n\0");
 
-			// TODO: Check current direction first and then set accordingly!
+			// Check if port is configured as input in which case a value can not be set.
+			if (!(DDRD & (_BV(PORTD7)))) {
+				i2c_load_response((int8_t)PRT_RET_ERR_INV_OPS, ctx_mango.port.fid, NULL);
+
+				break;
+			}
+
 			if (ctx_mango.port.data[(LEN_DAT - 1)] == 1) {
 				PORTD |= _BV(PORTD7);
 
@@ -147,25 +150,87 @@ void port_handler_D7() {
 
 			break;
 
-		case FID_PORT_D7_CH0_GET_VAL:
+		case FID_PORT_D7_CH0_GET_CFG:
+			usart_tx_debug("[+] PORTS: Handler D7: CH0_GET_CFG\r\n\0");
+
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+
 			break;
+
+		case FID_PORT_D7_CH0_GET_VAL:
+			usart_tx_debug("[+] PORTS: Handler D7: CH0_GET_VAL\r\n\0");
+
+			data = (uint8_t*)malloc(LEN_DAT);
+
+			if (!(DDRD & (_BV(PORTD7)))) {
+				// Port is configured as input.
+				if ((PIND & (_BV(PIND7)))) {
+					data[LEN_DAT - 1] = 1;
+				}
+				else {
+					data[LEN_DAT - 1] = 0;
+				}
+
+				i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, data);
+				free(data);
+
+				break;
+			}
+			else {
+				// Port is configured as output.
+				if ((PORTD & (_BV(PORTD7)))) {
+					data[LEN_DAT - 1] = 1;
+				}
+				else {
+					data[LEN_DAT - 1] = 0;
+				}
+
+				i2c_load_response((int8_t)PRT_RET_OK, ctx_mango.port.fid, data);
+				free(data);
+
+				break;
+			}
 
 		case FID_PORT_D7_CH1_SET_CFG_DIN:
-			break;
+			usart_tx_debug("[+] PORTS: Handler D7: CH1_SET_CFG_DIN\r\n\0");
 
-		case FID_PORT_D7_CH1_SET_CFG_DOU:
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+
 			break;
 
 		case FID_PORT_D7_CH1_SET_CFG_DIN_PUP:
+			usart_tx_debug("[+] PORTS: Handler D7: CH1_SET_CFG_DIN_PUP\r\n\0");
+
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+
+			break;
+
+		case FID_PORT_D7_CH1_SET_CFG_DOU:
+			usart_tx_debug("[+] PORTS: Handler D7: CH1_SET_CFG_DOU\r\n\0");
+
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+
 			break;
 
 		case FID_PORT_D7_CH1_SET_VAL:
+			usart_tx_debug("[+] PORTS: Handler D7: CH1_SET_VAL\r\n\0");
+
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+
 			break;
 
 		case FID_PORT_D7_CH1_GET_CFG:
+			usart_tx_debug("[+] PORTS: Handler D7: CH1_GET_CFG\r\n\0");
+
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+
 			break;
 
 		case FID_PORT_D7_CH1_GET_VAL:
+			usart_tx_debug("[+] PORTS: Handler D7: CH1_GET_VAL\r\n\0");
+
+			i2c_load_response((int8_t)PRT_RET_ERR_INV_FID, ctx_mango.port.fid, NULL);
+
 			break;
 
 		default:
