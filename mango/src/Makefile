@@ -1,4 +1,5 @@
 PROJECT=mango
+VERSION=v1.0
 BUILDDIR=./build/
 INCLUDEDIR=./include/
 
@@ -24,7 +25,7 @@ all: builddir $(OBJECTS)
 		-j .data \
 		-j .text \
 		$(BUILDDIR)$(PROJECT).elf \
-		$(BUILDDIR)$(PROJECT).hex
+		$(BUILDDIR)$(PROJECT)-$(VERSION).hex
 
 builddir:
 	$(shell mkdir -p $(BUILDDIR))
