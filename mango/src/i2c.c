@@ -5,14 +5,14 @@ static void i2c_isr_load_response_inv_prt(void) {
 }
 
 void i2c_init(uint8_t i2c_address) {
-	debug_uart_tx_string("[+] I2C: I2C init\r\n\0");
+	usart_tx_debug("[+] I2C: I2C init\r\n\0");
 
 	TWAR = (uint8_t)(i2c_address << 1); // Disable general call.
 	TWCR |= (uint8_t)((_BV(TWIE)) | (_BV(TWEN)) | (_BV(TWEA)) | (_BV(TWINT)));
 }
 
 void i2c_load_response(int8_t ret, uint8_t fid, uint8_t* data) {
-	debug_uart_tx_string("[+] I2C: Load response\r\n\0");
+	usart_tx_debug("[+] I2C: Load response\r\n\0");
 
 	memset(&ctx_mango.i2c.buffer, 0, LEN_BUF_I2C);
 
@@ -26,7 +26,7 @@ void i2c_load_response(int8_t ret, uint8_t fid, uint8_t* data) {
 
 /*
 NOTE:
-	Do not use the USART interface (debug_uart_tx_string()) or any hardware
+	Do not use the USART interface (usart_tx_debug()) or any hardware
 	peripherals from within the interrupt handler!
 */
 ISR(TWI_vect) {

@@ -5,12 +5,12 @@ CTX_MANGO_t ctx_mango;
 int main() {
 	cli();
 
-	debug_uart_init(9600);
+	usart_init();
 	i2c_init((uint8_t)I2C_ADDRESS);
 
 	memset(&ctx_mango, 0, sizeof(ctx_mango));
 
-	debug_uart_tx_string("[+] Mango: v1.0\r\n\0");
+	usart_tx_debug("[+] Mango: v1.0\r\n\0");
 
 	sei();
 

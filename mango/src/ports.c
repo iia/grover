@@ -1,7 +1,7 @@
 #include "mango.h"
 
 void port_handler_A0() {
-	debug_uart_tx_string("[+] PORTS: Handler A0\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler A0\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -10,7 +10,7 @@ void port_handler_A0() {
 }
 
 void port_handler_A1() {
-	debug_uart_tx_string("[+] PORTS: Handler A1\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler A1\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -19,7 +19,7 @@ void port_handler_A1() {
 }
 
 void port_handler_A2() {
-	debug_uart_tx_string("[+] PORTS: Handler A2\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler A2\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -28,7 +28,7 @@ void port_handler_A2() {
 }
 
 void port_handler_serial() {
-	debug_uart_tx_string("[+] PORTS: Handler serial\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler serial\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -37,7 +37,7 @@ void port_handler_serial() {
 }
 
 void port_handler_D2() {
-	debug_uart_tx_string("[+] PORTS: Handler D2\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler D2\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -46,7 +46,7 @@ void port_handler_D2() {
 }
 
 void port_handler_D3() {
-	debug_uart_tx_string("[+] PORTS: Handler D3\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler D3\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -55,7 +55,7 @@ void port_handler_D3() {
 }
 
 void port_handler_D4() {
-	debug_uart_tx_string("[+] PORTS: Handler D4\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler D4\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -64,7 +64,7 @@ void port_handler_D4() {
 }
 
 void port_handler_D5() {
-	debug_uart_tx_string("[+] PORTS: Handler D5\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler D5\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -73,7 +73,7 @@ void port_handler_D5() {
 }
 
 void port_handler_D6() {
-	debug_uart_tx_string("[+] PORTS: Handler D6\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler D6\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:
@@ -82,7 +82,7 @@ void port_handler_D6() {
 }
 
 void port_handler_D7() {
-	debug_uart_tx_string("[+] PORTS: Handler D7\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler D7\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		/*
@@ -97,7 +97,7 @@ void port_handler_D7() {
 		*/
 
 		case FID_PORT_D7_CH0_SET_CFG_DIN:
-			debug_uart_tx_string("[+] PORTS: Handler D7: CH0_SET_CFG_DIN\r\n\0");
+			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_CFG_DIN\r\n\0");
 
 			DDRD &= ~_BV(PIND7);
 
@@ -106,7 +106,7 @@ void port_handler_D7() {
 			break;
 
 		case FID_PORT_D7_CH0_SET_CFG_DOU:
-			debug_uart_tx_string("[+] PORTS: Handler D7: CH0_SET_CFG_DOU\r\n\0");
+			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_CFG_DOU\r\n\0");
 
 			DDRD |= _BV(PORTD7);
 
@@ -115,7 +115,7 @@ void port_handler_D7() {
 			break;
 
 		case FID_PORT_D7_CH0_SET_CFG_DIN_PUP:
-			debug_uart_tx_string("[+] PORTS: Handler D7: CH0_SET_CFG_DIN_PUP\r\n\0");
+			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_CFG_DIN_PUP\r\n\0");
 
 			DDRD &= ~_BV(PIND7);
 			PORTD |= _BV(PORTD7);
@@ -128,7 +128,7 @@ void port_handler_D7() {
 			break;
 
 		case FID_PORT_D7_CH0_SET_VAL:
-			debug_uart_tx_string("[+] PORTS: Handler D7: CH0_SET_VAL\r\n\0");
+			usart_tx_debug("[+] PORTS: Handler D7: CH0_SET_VAL\r\n\0");
 
 			// TODO: Check current direction first and then set accordingly!
 			if (ctx_mango.port.data[(LEN_DAT - 1)] == 1) {
@@ -174,7 +174,7 @@ void port_handler_D7() {
 }
 
 void port_handler_D8() {
-	debug_uart_tx_string("[+] PORTS: Handler D8\r\n\0");
+	usart_tx_debug("[+] PORTS: Handler D8\r\n\0");
 
 	switch (ctx_mango.port.fid) {
 		default:

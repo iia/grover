@@ -12,7 +12,7 @@
 
 #include "i2c.h"
 #include "ports.h"
-#include "debug_uart.h"
+#include "usart.h"
 
 typedef void (*TASK_I2C_ISR_RESPONSE_t)(void);
 
