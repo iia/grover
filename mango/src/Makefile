@@ -50,7 +50,7 @@ flash:
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U lfuse:w:0xFF:m; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U hfuse:w:0xDA:m; \
 		avrdude -p $(MCU) -c $(PROGRAMMER) -U efuse:w:0x05:m; \
-		avrdude -p $(MCU) -c $(PROGRAMMER) -U flash:w:$(BUILDDIR)$(PROJECT).hex:a; \
+		avrdude -p $(MCU) -c $(PROGRAMMER) -U flash:w:$(BUILDDIR)$(PROJECT)-$(VERSION).hex:a; \
 		echo 8 > /sys/class/gpio/export; \
 		echo out > /sys/class/gpio/gpio8/direction; \
 		echo 1 > /sys/class/gpio/gpio8/value; \
