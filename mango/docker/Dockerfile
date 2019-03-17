@@ -1,4 +1,5 @@
 FROM arm32v7/ubuntu:18.04
+USER root
 
 MAINTAINER Ishraq Ibne Ashraf 'ishraq.i.ashraf@gmail.com'
 
