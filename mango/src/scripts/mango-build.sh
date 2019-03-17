@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 make -C /root/src/ clean
 make -C /root/src/ all
