@@ -2,7 +2,7 @@
     <img
         width="450px"
         style="text-align: center;"
-        src="https://github.com/iia/grover/blob/master/.readme-resources/grover.png" />
+        src=".github/res/img/grover.png" />
 </p>
 
 # Grover
