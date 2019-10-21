@@ -1,6 +1,6 @@
 <p align="center">
     <img
-        width="35%"
+        width="45%"
         style="text-align: center;"
         src=".github/res/img/grover.png" />
 </p>
