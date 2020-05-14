@@ -1,0 +1,7 @@
+PROGRAMMER=linuxspi
+
+FFLAGS_EXTRA += -P /dev/spidev0.1
+
+INCLUDES += -I$(RIOTBOARD)/common/atmega/include
+
+include $(RIOTBOARD)/common/atmega/Makefile.include

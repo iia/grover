@@ -1,35 +1,43 @@
-FROM arm32v5/debian:buster
+FROM raspbian/stretch:latest
 
 MAINTAINER Ishraq Ibne Ashraf 'ishraq.i.ashraf@gmail.com'
 
-# Prepapre.
+# Switch to the root user.
 USER root
 
+# Create a non-root user.
+RUN useradd -ms /bin/bash mango
+
 # Install dependencies.
-RUN apt update -y
-RUN apt upgrade -y
-RUN apt install \
-    make \
-    flex \
-    bison \
-    libelf1 \
-    libzip4 \
-    gcc-avr \
-    avr-libc \
-    libftdi1 \
-    libudev1 \
-    libftdi1-2 \
-    libelf-dev \
-    libusb-dev \
-    libftdi-dev \
-    libftdi1-dev \
-    libusb-0.1-4 \
-    libusb-1.0-0 \
-    build-essential \
-    libusb-1.0-0-dev -y
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install \
+git \
+unzip \
+avrdude \
+gcc-avr \
+python3 \
+avr-libc \
+build-essential -y
 
-# Add local directories to the image.
-ADD ./usr/ /usr/
+# Copy custom files.
+COPY ./etc/avrdude.conf /etc/avrdude.conf
 
-# Set default PWD.
-WORKDIR /root/src/
+# Switch to non-root user.
+USER mango
+
+# Get RIOT OS source.
+WORKDIR /home/mango/
+RUN git clone -b 2020.04-branch --depth=1 https://github.com/RIOT-OS/RIOT.git
+
+# Set SUID of executables.
+USER root
+
+RUN chmod u+s /usr/bin/tee
+RUN chmod u+s /usr/bin/avrdude
+
+# Switch back to the normal user.
+USER mango
+
+# Set working directory.
+WORKDIR /home/mango/
